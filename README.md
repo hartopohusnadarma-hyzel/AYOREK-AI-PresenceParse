@@ -338,6 +338,10 @@
             border-top: 4px solid #2196F3;
         }
         
+        .summary-card.sick {
+            border-top: 4px solid #9C27B0;
+        }
+        
         .chart-container {
             margin: 1.5rem 0;
             height: 250px;
@@ -383,6 +387,11 @@
         
         .status-permission {
             color: #2196F3;
+            font-weight: 600;
+        }
+        
+        .status-sick {
+            color: #9C27B0;
             font-weight: 600;
         }
         
@@ -487,7 +496,7 @@
             }
             
             .summary-cards {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(5, 1fr);
             }
             
             .btn {
@@ -602,9 +611,10 @@
                         <p>Tempel data kehadiran mentah dari WhatsApp, Zoom, Google Meet, atau platform lainnya:</p>
                         <textarea class="input-area" id="paste-input" placeholder="Contoh:
 Andi - Hadir
-Budi - Izin (Sakit)
+Budi - Izin (Acara Keluarga)
 Citra - Terlambat
 Dewi - Hadir
+Eko - Sakit
 ..."></textarea>
                         <button class="btn" id="process-paste">
                             <span>Proses Data</span>
@@ -661,6 +671,10 @@ Dewi - Hadir
                             <h3 id="permission-count">0</h3>
                             <p>Izin</p>
                         </div>
+                        <div class="summary-card sick">
+                            <h3 id="sick-count">0</h3>
+                            <p>Sakit</p>
+                        </div>
                     </div>
                     
                     <div class="chart-container">
@@ -669,7 +683,7 @@ Dewi - Hadir
                     
                     <div class="quick-summary">
                         <h3>Ringkasan Cepat</h3>
-                        <p id="quick-summary-text">Total 0 peserta, 0 Hadir, 0 Absen, 0 Terlambat, 0 Izin</p>
+                        <p id="quick-summary-text">Total 0 peserta, 0 Hadir, 0 Absen, 0 Terlambat, 0 Izin, 0 Sakit</p>
                         <button class="btn btn-outline" id="copy-summary">
                             <span>Salin Ringkasan</span>
                         </button>
@@ -884,7 +898,7 @@ Dewi - Hadir
             setTimeout(() => {
                 // In a real implementation, this would use an OCR API
                 // For demo purposes, we'll use a sample text
-                const sampleText = "Andi - Hadir\nBudi - Izin (Sakit)\nCitra - Terlambat\nDewi - Hadir\nEko - Absen\nFajar - Hadir\nGita - Izin (Keluarga)\nHana - Terlambat\nIvan - Hadir\nJoko - Hadir";
+                const sampleText = "Andi - Hadir\nBudi - Izin (Acara Keluarga)\nCitra - Terlambat\nDewi - Hadir\nEko - Sakit\nFajar - Hadir\nGita - Izin (Urusan Pribadi)\nHana - Terlambat\nIvan - Hadir\nJoko - Sakit (Demam)";
                 const processedData = parseAttendanceData(sampleText);
                 hideLoading();
                 displayResults(processedData);
@@ -914,6 +928,7 @@ Dewi - Hadir
             let absentCount = 0;
             let lateCount = 0;
             let permissionCount = 0;
+            let sickCount = 0;
             
             lines.forEach((line, index) => {
                 let name = '';
@@ -923,7 +938,7 @@ Dewi - Hadir
                 // Clean the line
                 const cleanLine = line.trim();
                 
-                // Simple parsing logic
+                // Enhanced parsing logic with "Sakit" as separate category
                 if (cleanLine.toLowerCase().includes('hadir')) {
                     status = 'Hadir';
                     presentCount++;
@@ -933,12 +948,21 @@ Dewi - Hadir
                 } else if (cleanLine.toLowerCase().includes('terlambat')) {
                     status = 'Terlambat';
                     lateCount++;
-                } else if (cleanLine.toLowerCase().includes('izin')) {
+                } else if (cleanLine.toLowerCase().includes('izin') && !cleanLine.toLowerCase().includes('sakit')) {
                     status = 'Izin';
                     permissionCount++;
                     
                     // Extract reason if available
                     const reasonMatch = line.match(/izin\s*\(([^)]+)\)/i);
+                    if (reasonMatch) {
+                        notes = reasonMatch[1];
+                    }
+                } else if (cleanLine.toLowerCase().includes('sakit')) {
+                    status = 'Sakit';
+                    sickCount++;
+                    
+                    // Extract reason if available
+                    const reasonMatch = line.match(/sakit\s*\(([^)]+)\)/i);
                     if (reasonMatch) {
                         notes = reasonMatch[1];
                     }
@@ -976,6 +1000,7 @@ Dewi - Hadir
                     absent: absentCount,
                     late: lateCount,
                     permission: permissionCount,
+                    sick: sickCount,
                     total: lines.length
                 }
             };
@@ -989,9 +1014,10 @@ Dewi - Hadir
             document.getElementById('absent-count').textContent = processedData.summary.absent;
             document.getElementById('late-count').textContent = processedData.summary.late;
             document.getElementById('permission-count').textContent = processedData.summary.permission;
+            document.getElementById('sick-count').textContent = processedData.summary.sick;
             
             // Update quick summary
-            const quickSummary = `Total ${processedData.summary.total} peserta, ${processedData.summary.present} Hadir, ${processedData.summary.absent} Absen, ${processedData.summary.late} Terlambat, ${processedData.summary.permission} Izin`;
+            const quickSummary = `Total ${processedData.summary.total} peserta, ${processedData.summary.present} Hadir, ${processedData.summary.absent} Absen, ${processedData.summary.late} Terlambat, ${processedData.summary.permission} Izin, ${processedData.summary.sick} Sakit`;
             document.getElementById('quick-summary-text').textContent = quickSummary;
             
             // Update table
@@ -1006,6 +1032,7 @@ Dewi - Hadir
                 else if (item.status === 'Absen') statusClass = 'status-absent';
                 else if (item.status === 'Terlambat') statusClass = 'status-late';
                 else if (item.status === 'Izin') statusClass = 'status-permission';
+                else if (item.status === 'Sakit') statusClass = 'status-sick';
                 
                 row.innerHTML = `
                     <td>${item.id}</td>
@@ -1040,21 +1067,29 @@ Dewi - Hadir
             attendanceChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Hadir', 'Absen', 'Terlambat', 'Izin'],
+                    labels: ['Hadir', 'Absen', 'Terlambat', 'Izin', 'Sakit'],
                     datasets: [{
                         label: 'Jumlah Peserta',
-                        data: [summary.present, summary.absent, summary.late, summary.permission],
+                        data: [
+                            summary.present, 
+                            summary.absent, 
+                            summary.late, 
+                            summary.permission, 
+                            summary.sick
+                        ],
                         backgroundColor: [
-                            '#4CAF50',
-                            '#F44336',
-                            '#FF9800',
-                            '#2196F3'
+                            '#4CAF50',  // Hijau untuk Hadir
+                            '#F44336',  // Merah untuk Absen
+                            '#FF9800',  // Oranye untuk Terlambat
+                            '#2196F3',  // Biru untuk Izin
+                            '#9C27B0'   // Ungu untuk Sakit
                         ],
                         borderColor: [
                             '#388E3C',
                             '#D32F2F',
                             '#F57C00',
-                            '#1976D2'
+                            '#1976D2',
+                            '#7B1FA2'
                         ],
                         borderWidth: 1
                     }]
@@ -1124,15 +1159,17 @@ Dewi - Hadir
         window.addEventListener('load', () => {
             // Pre-fill with sample data for demo
             const sampleData = `Andi Wijaya - Hadir
-Budi Santoso - Izin (Sakit)
+Budi Santoso - Izin (Acara Keluarga)
 Citra Lestari - Terlambat
 Dewi Anggraini - Hadir
 Eko Prasetyo - Absen
 Fajar Nugroho - Hadir
-Gita Maharani - Izin (Keluarga)
+Gita Maharani - Izin (Urusan Pribadi)
 Hana Puspita - Terlambat
 Ivan Setiawan - Hadir
-Joko Susilo - Hadir`;
+Joko Susilo - Sakit (Demam)
+Kartika Sari - Sakit
+Lia Amelia - Hadir`;
             
             document.getElementById('paste-input').value = sampleData;
             
