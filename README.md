@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PresenceParse - Rekap Absensi Universal</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -24,139 +24,188 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+        }
+        
+        html {
+            scroll-behavior: smooth;
         }
         
         body {
             background-color: #f5f7fb;
             color: var(--dark);
             line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 15px;
+            width: 100%;
         }
         
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 2rem 0;
+            padding: 1rem 0;
             box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
         }
         
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .logo {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-shrink: 0;
         }
         
         .logo-icon {
-            font-size: 2rem;
+            font-size: 1.8rem;
         }
         
         .logo h1 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
+            white-space: nowrap;
+        }
+        
+        nav {
+            width: 100%;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        nav.active {
+            display: block;
         }
         
         nav ul {
             display: flex;
             list-style: none;
-            gap: 20px;
+            gap: 10px;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 10px;
         }
         
         nav a {
             color: white;
             text-decoration: none;
             font-weight: 500;
-            padding: 5px 10px;
+            padding: 8px 12px;
             border-radius: var(--border-radius);
             transition: background-color 0.3s;
+            display: block;
         }
         
         nav a:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
         
+        .mobile-menu-btn {
+            display: block;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
         .hero {
-            padding: 3rem 0;
+            padding: 2rem 0;
             text-align: center;
             max-width: 800px;
             margin: 0 auto;
         }
         
         .hero h2 {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             margin-bottom: 1rem;
             color: var(--primary);
+            line-height: 1.3;
         }
         
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--gray);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         
         .features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
         }
         
         .feature-card {
             background: white;
             border-radius: var(--border-radius);
-            padding: 2rem;
+            padding: 1.5rem;
             box-shadow: var(--box-shadow);
             transition: transform 0.3s;
         }
         
         .feature-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
         }
         
         .feature-icon {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: var(--primary);
             margin-bottom: 1rem;
         }
         
         .feature-card h3 {
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
             color: var(--primary);
+            font-size: 1.2rem;
         }
         
         .main-content {
             background: white;
             border-radius: var(--border-radius);
-            padding: 2rem;
+            padding: 1.5rem;
             box-shadow: var(--box-shadow);
-            margin: 2rem 0;
+            margin: 1.5rem 0;
         }
         
         .tab-container {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         
         .tabs {
             display: flex;
             border-bottom: 1px solid #ddd;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
         }
         
         .tab {
-            padding: 10px 20px;
+            padding: 10px 15px;
             cursor: pointer;
             border-bottom: 3px solid transparent;
             transition: all 0.3s;
+            font-size: 0.9rem;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
         }
         
         .tab.active {
@@ -175,19 +224,20 @@
         
         .input-area {
             width: 100%;
-            min-height: 200px;
+            min-height: 150px;
             padding: 1rem;
             border: 1px solid #ddd;
             border-radius: var(--border-radius);
             font-family: monospace;
             margin-bottom: 1rem;
             resize: vertical;
+            font-size: 16px; /* Mencegah zoom di iOS */
         }
         
         .file-upload {
             border: 2px dashed #ddd;
             border-radius: var(--border-radius);
-            padding: 2rem;
+            padding: 1.5rem;
             text-align: center;
             margin-bottom: 1rem;
             cursor: pointer;
@@ -199,7 +249,7 @@
         }
         
         .file-upload i {
-            font-size: 3rem;
+            font-size: 2.5rem;
             color: var(--gray);
             margin-bottom: 1rem;
         }
@@ -208,15 +258,19 @@
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 12px 20px;
             border-radius: var(--border-radius);
             cursor: pointer;
             font-weight: 600;
             transition: background-color 0.3s;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             font-size: 1rem;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
         }
         
         .btn:hover {
@@ -240,7 +294,7 @@
         }
         
         .results {
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             display: none;
         }
         
@@ -250,21 +304,21 @@
         
         .summary-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         
         .summary-card {
             background: white;
             border-radius: var(--border-radius);
-            padding: 1.5rem;
+            padding: 1rem;
             box-shadow: var(--box-shadow);
             text-align: center;
         }
         
         .summary-card h3 {
-            font-size: 2rem;
+            font-size: 1.5rem;
             margin-bottom: 0.5rem;
         }
         
@@ -285,8 +339,8 @@
         }
         
         .chart-container {
-            margin: 2rem 0;
-            height: 300px;
+            margin: 1.5rem 0;
+            height: 250px;
             position: relative;
         }
         
@@ -294,10 +348,11 @@
             width: 100%;
             border-collapse: collapse;
             margin: 1rem 0;
+            font-size: 0.9rem;
         }
         
         th, td {
-            padding: 12px 15px;
+            padding: 10px 8px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
@@ -336,25 +391,32 @@
             gap: 1rem;
             margin-top: 1rem;
             flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .export-options .btn {
+            width: auto;
+            min-width: 150px;
         }
         
         footer {
             background-color: var(--dark);
             color: white;
-            padding: 2rem 0;
-            margin-top: 3rem;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
         }
         
         .footer-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .loading {
             display: none;
             text-align: center;
-            padding: 2rem;
+            padding: 1.5rem;
         }
         
         .loading.spinner {
@@ -372,37 +434,100 @@
             100% { transform: rotate(360deg); }
         }
         
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
+        /* Media queries untuk tablet */
+        @media (min-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+            
+            header {
+                padding: 1.5rem 0;
+            }
+            
+            .logo h1 {
+                font-size: 1.8rem;
+            }
+            
+            .mobile-menu-btn {
+                display: none;
+            }
+            
+            nav {
+                display: block;
+                width: auto;
+                margin-top: 0;
             }
             
             nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
+                flex-direction: row;
+                background: transparent;
+                padding: 0;
+            }
+            
+            .hero {
+                padding: 3rem 0;
             }
             
             .hero h2 {
-                font-size: 2rem;
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
             }
             
             .features {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+                margin: 3rem 0;
             }
             
-            .tabs {
+            .main-content {
+                padding: 2rem;
+            }
+            
+            .summary-cards {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .btn {
+                width: auto;
+                margin: 0;
+            }
+        }
+        
+        /* Media queries untuk desktop */
+        @media (min-width: 1024px) {
+            .features {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        /* Perbaikan khusus untuk iOS */
+        @supports (-webkit-touch-callout: none) {
+            .input-area {
+                font-size: 16px;
+            }
+            
+            .btn {
+                -webkit-appearance: none;
+            }
+        }
+        
+        /* Perbaikan untuk browser lama */
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            .features {
+                display: flex;
                 flex-wrap: wrap;
             }
             
-            .export-options {
-                flex-direction: column;
-            }
-            
-            .footer-content {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
+            .feature-card {
+                flex: 1 1 300px;
+                margin: 10px;
             }
         }
     </style>
@@ -415,7 +540,8 @@
                     <div class="logo-icon">📊</div>
                     <h1>PresenceParse</h1>
                 </div>
-                <nav>
+                <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+                <nav id="main-nav">
                     <ul>
                         <li><a href="#home">Beranda</a></li>
                         <li><a href="#features">Fitur</a></li>
@@ -550,19 +676,21 @@ Dewi - Hadir
                     </div>
                     
                     <h3 style="margin-top: 2rem;">Detail Kehadiran</h3>
-                    <table id="attendance-table">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Nama</th>
-                                <th>Status</th>
-                                <th>Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendance-table-body">
-                            <!-- Data akan diisi oleh JavaScript -->
-                        </tbody>
-                    </table>
+                    <div style="overflow-x: auto;">
+                        <table id="attendance-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>Status</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-table-body">
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
                     
                     <div class="export-options">
                         <button class="btn" id="export-csv">
@@ -595,6 +723,21 @@ Dewi - Hadir
     <script>
         // Inisialisasi chart global
         let attendanceChart = null;
+
+        // Mobile menu functionality
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mainNav = document.getElementById('main-nav');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                mainNav.classList.remove('active');
+            });
+        });
 
         // Tab functionality
         document.querySelectorAll('.tab').forEach(tab => {
@@ -991,10 +1134,4 @@ Hana Puspita - Terlambat
 Ivan Setiawan - Hadir
 Joko Susilo - Hadir`;
             
-            document.getElementById('paste-input').value = sampleData;
-            
-            console.log("Website PresenceParse berhasil dimuat!");
-        });
-    </script>
-</body>
-</html>
+            document.getElementById
