@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PresenceParse - Rekap Absensi Universal</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #4361ee;
@@ -293,6 +294,14 @@
             color: white;
         }
         
+        .btn-success {
+            background-color: #4CAF50;
+        }
+        
+        .btn-success:hover {
+            background-color: #45a049;
+        }
+        
         .results {
             margin-top: 1.5rem;
             display: none;
@@ -552,10 +561,10 @@
                 <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
                 <nav id="main-nav">
                     <ul>
-                        <li><a href="#home">Beranda</a></li>
-                        <li><a href="#features">Fitur</a></li>
-                        <li><a href="#process">Proses Data</a></li>
-                        <li><a href="#results">Hasil</a></li>
+                        <li><a href="#home" class="nav-link">Beranda</a></li>
+                        <li><a href="#features" class="nav-link">Fitur</a></li>
+                        <li><a href="#process" class="nav-link">Proses Data</a></li>
+                        <li><a href="#results" class="nav-link">Hasil</a></li>
                     </ul>
                 </nav>
             </div>
@@ -707,14 +716,14 @@ Eko - Sakit
                     </div>
                     
                     <div class="export-options">
-                        <button class="btn" id="export-csv">
-                            <span>Ekspor ke CSV</span>
+                        <button class="btn btn-success" id="export-csv">
+                            <span>📥 Ekspor ke CSV</span>
                         </button>
-                        <button class="btn" id="export-excel">
-                            <span>Ekspor ke Excel</span>
+                        <button class="btn btn-success" id="export-excel">
+                            <span>📊 Ekspor ke Excel</span>
                         </button>
                         <button class="btn btn-outline" id="reset-data">
-                            <span>Proses Data Baru</span>
+                            <span>🔄 Proses Data Baru</span>
                         </button>
                     </div>
                 </div>
@@ -737,6 +746,7 @@ Eko - Sakit
     <script>
         // Inisialisasi chart global
         let attendanceChart = null;
+        let currentProcessedData = null;
 
         // Mobile menu functionality
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
@@ -746,10 +756,23 @@ Eko - Sakit
             mainNav.classList.toggle('active');
         });
 
-        // Close mobile menu when clicking on a link
-        document.querySelectorAll('nav a').forEach(link => {
-            link.addEventListener('click', () => {
-                mainNav.classList.remove('active');
+        // Perbaikan navigasi - handle semua link navigasi
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                
+                if (targetSection) {
+                    // Tutup mobile menu jika terbuka
+                    mainNav.classList.remove('active');
+                    
+                    // Scroll ke section target
+                    targetSection.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             });
         });
 
@@ -1008,6 +1031,7 @@ Eko - Sakit
         
         function displayResults(processedData) {
             console.log("Menampilkan hasil:", processedData);
+            currentProcessedData = processedData;
             
             // Update summary cards
             document.getElementById('present-count').textContent = processedData.summary.present;
@@ -1126,14 +1150,99 @@ Eko - Sakit
             });
         });
         
-        // Export functionality
+        // Export to CSV functionality
         document.getElementById('export-csv').addEventListener('click', () => {
-            alert('Fitur ekspor CSV akan diimplementasikan dalam versi lengkap.');
+            if (!currentProcessedData) {
+                alert('Tidak ada data untuk diekspor. Silakan proses data terlebih dahulu.');
+                return;
+            }
+            
+            exportToCSV(currentProcessedData);
         });
         
+        // Export to Excel functionality
         document.getElementById('export-excel').addEventListener('click', () => {
-            alert('Fitur ekspor Excel akan diimplementasikan dalam versi lengkap.');
+            if (!currentProcessedData) {
+                alert('Tidak ada data untuk diekspor. Silakan proses data terlebih dahulu.');
+                return;
+            }
+            
+            exportToExcel(currentProcessedData);
         });
+        
+        function exportToCSV(processedData) {
+            let csvContent = "No,Nama,Status,Keterangan\n";
+            
+            processedData.data.forEach(item => {
+                csvContent += `"${item.id}","${item.name}","${item.status}","${item.notes}"\n`;
+            });
+            
+            // Add summary section
+            csvContent += "\n\nSUMMARY\n";
+            csvContent += `Total Peserta,${processedData.summary.total}\n`;
+            csvContent += `Hadir,${processedData.summary.present}\n`;
+            csvContent += `Absen,${processedData.summary.absent}\n`;
+            csvContent += `Terlambat,${processedData.summary.late}\n`;
+            csvContent += `Izin,${processedData.summary.permission}\n`;
+            csvContent += `Sakit,${processedData.summary.sick}\n`;
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `rekap_kehadiran_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showExportSuccess('CSV');
+        }
+        
+        function exportToExcel(processedData) {
+            try {
+                // Prepare worksheet data
+                const worksheetData = [
+                    ["No", "Nama", "Status", "Keterangan"],
+                    ...processedData.data.map(item => [item.id, item.name, item.status, item.notes]),
+                    [""],
+                    ["SUMMARY"],
+                    ["Total Peserta", processedData.summary.total],
+                    ["Hadir", processedData.summary.present],
+                    ["Absen", processedData.summary.absent],
+                    ["Terlambat", processedData.summary.late],
+                    ["Izin", processedData.summary.permission],
+                    ["Sakit", processedData.summary.sick]
+                ];
+                
+                // Create workbook and worksheet
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+                
+                // Add worksheet to workbook
+                XLSX.utils.book_append_sheet(wb, ws, "Rekap Kehadiran");
+                
+                // Generate Excel file and download
+                XLSX.writeFile(wb, `rekap_kehadiran_${new Date().toISOString().split('T')[0]}.xlsx`);
+                
+                showExportSuccess('Excel');
+            } catch (error) {
+                console.error('Error exporting to Excel:', error);
+                alert('Terjadi error saat mengekspor ke Excel. Silakan coba lagi.');
+            }
+        }
+        
+        function showExportSuccess(format) {
+            const button = document.getElementById(`export-${format.toLowerCase()}`);
+            const originalText = button.querySelector('span').textContent;
+            button.querySelector('span').textContent = `✅ ${format} Terunduh!`;
+            button.style.backgroundColor = '#4CAF50';
+            
+            setTimeout(() => {
+                button.querySelector('span').textContent = originalText;
+                button.style.backgroundColor = '';
+            }, 2000);
+        }
         
         // Reset data functionality
         document.getElementById('reset-data').addEventListener('click', () => {
@@ -1145,6 +1254,7 @@ Eko - Sakit
             ocrUploadArea.querySelector('p').textContent = 'Klik untuk memilih gambar atau seret gambar ke sini';
             processFileBtn.disabled = true;
             processOcrBtn.disabled = true;
+            currentProcessedData = null;
             
             // Scroll back to process section
             document.getElementById('process').scrollIntoView({ behavior: 'smooth' });
@@ -1152,7 +1262,13 @@ Eko - Sakit
         
         // Scroll to section function
         function scrollToSection(sectionId) {
-            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
         }
         
         // Initialize with sample data for demo
