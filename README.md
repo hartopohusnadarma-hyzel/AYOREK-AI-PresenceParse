@@ -232,7 +232,7 @@
             font-family: monospace;
             margin-bottom: 1rem;
             resize: vertical;
-            font-size: 16px; /* Mencegah zoom di iOS */
+            font-size: 16px;
         }
         
         .file-upload {
@@ -452,6 +452,76 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* NEW STYLES FOR TIME-BASED FEATURE */
+        .time-configuration {
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .time-input-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .time-input {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            width: 120px;
+        }
+        
+        .time-example {
+            background: #e7f3ff;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .time-example code {
+            background: #ffffff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .time-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .status-early {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .status-ontime {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .status-late {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .time-detail {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        
         /* Media queries untuk tablet */
         @media (min-width: 768px) {
             .container {
@@ -573,8 +643,8 @@
 
     <section class="hero" id="home">
         <div class="container">
-            <h2>Ubah Data Kehadiran Mentah Menjadi Laporan yang Rapi</h2>
-            <p>PresenceParse menerima berbagai format data kehadiran dan mengubahnya menjadi laporan yang mudah dianalisis dengan visualisasi yang informatif.</p>
+            <h2>Analisis Kehadiran Cerdas Berbasis Waktu</h2>
+            <p>PresenceParse kini dengan fitur analisis waktu otomatis! Tentukan batas waktu, sistem akan secara cerdas mengkategorikan tepat waktu, terlambat, atau early.</p>
             <button class="btn" onclick="scrollToSection('process')">
                 <span>Coba Sekarang</span>
             </button>
@@ -586,9 +656,9 @@
             <h2 style="text-align: center; margin-bottom: 2rem;">Fitur Unggulan</h2>
             <div class="features">
                 <div class="feature-card">
-                    <div class="feature-icon">📋</div>
-                    <h3>Input Data Fleksibel</h3>
-                    <p>Terima berbagai jenis input: copy-paste teks, unggah file CSV, atau ekstrak teks dari gambar dengan teknologi OCR.</p>
+                    <div class="feature-icon">⏰</div>
+                    <h3>Analisis Waktu Cerdas</h3>
+                    <p>Otomatis deteksi status tepat waktu, early, atau terlambat berdasarkan batas waktu yang Anda tentukan.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🧠</div>
@@ -609,6 +679,28 @@
             <div class="main-content">
                 <h2 style="margin-bottom: 1.5rem;">Proses Data Kehadiran</h2>
                 
+                <!-- NEW TIME CONFIGURATION SECTION -->
+                <div class="time-configuration">
+                    <h3>⚙️ Konfigurasi Waktu</h3>
+                    <div class="time-input-group">
+                        <label><strong>Batas Waktu Tepat Waktu:</strong></label>
+                        <input type="time" class="time-input" id="on-time-limit" value="07:00">
+                        <span>(Contoh: 07:00)</span>
+                    </div>
+                    <div class="time-input-group">
+                        <label><strong>Batas Waktu Terlambat:</strong></label>
+                        <input type="time" class="time-input" id="late-time-limit" value="07:15">
+                        <span>(Contoh: 07:15)</span>
+                    </div>
+                    <p><small>💡 <strong>Early:</strong> Sebelum batas tepat waktu | <strong>Tepat Waktu:</strong> Sesuai batas | <strong>Terlambat:</strong> Setelah batas terlambat</small></p>
+                    
+                    <div class="time-example">
+                        <strong>Contoh Format Data:</strong><br>
+                        <code>Nama (HH:MM)</code> atau <code>Nama - HH.MM</code><br>
+                        Contoh: <code>Yessika (06:35)</code> atau <code>risa alveria (06.16)</code>
+                    </div>
+                </div>
+                
                 <div class="tab-container">
                     <div class="tabs">
                         <div class="tab active" data-tab="paste">Copy-Paste Teks</div>
@@ -617,21 +709,42 @@
                     </div>
                     
                     <div class="tab-content active" id="paste-content">
-                        <p>Tempel data kehadiran mentah dari WhatsApp, Zoom, Google Meet, atau platform lainnya:</p>
+                        <p>Tempel data kehadiran dengan format waktu:</p>
                         <textarea class="input-area" id="paste-input" placeholder="Contoh:
-Andi - Hadir
-Budi - Izin (Acara Keluarga)
-Citra - Terlambat
-Dewi - Hadir
-Eko - Sakit
-..."></textarea>
+List piket PMR 17 April 2025
+1. Yessika (06:35)
+2. risa alveria (06.16) 
+3. nadatul aiysah (06.27)
+4. Riska auliya (6:51)
+5. Tara aldiana nahara sakila (6:51)
+6. Rachmania (6.34) mengganti hari senin 
+7. Salsa nur(6.13)
+8. Delfi Anandarista (06.20)
+9. Hartopo husna d ( 06.33 )
+10. Nurul (06.55)
+11. Rehan (06.35)
+12. Aisyah Amelia (06.57)
+13. Ucik deanita (06.04)">List piket PMR 17 April 2025
+1. Yessika (06:35)
+2. risa alveria (06.16) 
+3. nadatul aiysah (06.27)
+4. Riska auliya (6:51)
+5. Tara aldiana nahara sakila (6:51)
+6. Rachmania (6.34) mengganti hari senin 
+7. Salsa nur(6.13)
+8. Delfi Anandarista (06.20)
+9. Hartopo husna d ( 06.33 )
+10. Nurul (06.55)
+11. Rehan (06.35)
+12. Aisyah Amelia (06.57)
+13. Ucik deanita (06.04)</textarea>
                         <button class="btn" id="process-paste">
-                            <span>Proses Data</span>
+                            <span>Analisis Data Waktu</span>
                         </button>
                     </div>
                     
                     <div class="tab-content" id="upload-content">
-                        <p>Unggah file teks atau CSV yang berisi data kehadiran:</p>
+                        <p>Unggah file teks atau CSV yang berisi data kehadiran dengan waktu:</p>
                         <div class="file-upload" id="file-upload-area">
                             <i>📁</i>
                             <p>Klik untuk memilih file atau seret file ke sini</p>
@@ -643,7 +756,7 @@ Eko - Sakit
                     </div>
                     
                     <div class="tab-content" id="ocr-content">
-                        <p>Unggah tangkapan layar atau gambar yang berisi daftar kehadiran:</p>
+                        <p>Unggah tangkapan layar atau gambar yang berisi daftar kehadiran dengan waktu:</p>
                         <div class="file-upload" id="ocr-upload-area">
                             <i>🖼️</i>
                             <p>Klik untuk memilih gambar atau seret gambar ke sini</p>
@@ -657,24 +770,24 @@ Eko - Sakit
                 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <p>Memproses data kehadiran...</p>
+                    <p>Menganalisis data kehadiran...</p>
                 </div>
                 
                 <div class="results" id="results-section">
-                    <h2>Hasil Rekap Kehadiran</h2>
+                    <h2>Hasil Analisis Kehadiran</h2>
                     
                     <div class="summary-cards">
                         <div class="summary-card present">
                             <h3 id="present-count">0</h3>
-                            <p>Hadir</p>
+                            <p>Tepat Waktu</p>
                         </div>
                         <div class="summary-card absent">
                             <h3 id="absent-count">0</h3>
-                            <p>Absen</p>
+                            <p>Terlambat</p>
                         </div>
                         <div class="summary-card late">
                             <h3 id="late-count">0</h3>
-                            <p>Terlambat</p>
+                            <p>Early</p>
                         </div>
                         <div class="summary-card permission">
                             <h3 id="permission-count">0</h3>
@@ -692,19 +805,21 @@ Eko - Sakit
                     
                     <div class="quick-summary">
                         <h3>Ringkasan Cepat</h3>
-                        <p id="quick-summary-text">Total 0 peserta, 0 Hadir, 0 Absen, 0 Terlambat, 0 Izin, 0 Sakit</p>
+                        <p id="quick-summary-text">Total 0 peserta, 0 Tepat Waktu, 0 Terlambat, 0 Early, 0 Izin, 0 Sakit</p>
+                        <p id="time-config-summary" style="font-size: 0.9rem; color: var(--gray); margin-top: 0.5rem;"></p>
                         <button class="btn btn-outline" id="copy-summary">
                             <span>Salin Ringkasan</span>
                         </button>
                     </div>
                     
-                    <h3 style="margin-top: 2rem;">Detail Kehadiran</h3>
+                    <h3 style="margin-top: 2rem;">Detail Analisis Waktu</h3>
                     <div style="overflow-x: auto;">
                         <table id="attendance-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
                                     <th>Nama</th>
+                                    <th>Waktu</th>
                                     <th>Status</th>
                                     <th>Keterangan</th>
                                 </tr>
@@ -723,7 +838,7 @@ Eko - Sakit
                             <span>📊 Ekspor ke Excel</span>
                         </button>
                         <button class="btn btn-outline" id="reset-data">
-                            <span>🔄 Proses Data Baru</span>
+                            <span>🔄 Analisis Data Baru</span>
                         </button>
                     </div>
                 </div>
@@ -919,18 +1034,28 @@ Eko - Sakit
             showLoading();
             // Simulate OCR processing
             setTimeout(() => {
-                // In a real implementation, this would use an OCR API
-                // For demo purposes, we'll use a sample text
-                const sampleText = "Andi - Hadir\nBudi - Izin (Acara Keluarga)\nCitra - Terlambat\nDewi - Hadir\nEko - Sakit\nFajar - Hadir\nGita - Izin (Urusan Pribadi)\nHana - Terlambat\nIvan - Hadir\nJoko - Sakit (Demam)";
+                const sampleText = `List piket PMR 17 April 2025
+1. Yessika (06:35)
+2. risa alveria (06.16) 
+3. nadatul aiysah (06.27)
+4. Riska auliya (6:51)
+5. Tara aldiana nahara sakila (6:51)
+6. Rachmania (6.34) mengganti hari senin 
+7. Salsa nur(6.13)
+8. Delfi Anandarista (06.20)
+9. Hartopo husna d ( 06.33 )
+10. Nurul (06.55)
+11. Rehan (06.35)
+12. Aisyah Amelia (06.57)
+13. Ucik deanita (06.04)`;
                 const processedData = parseAttendanceData(sampleText);
                 hideLoading();
                 displayResults(processedData);
                 
-                // Show a message that this is simulated
                 setTimeout(() => {
                     alert('Catatan: Ini adalah simulasi OCR. Dalam implementasi nyata, gambar akan diproses dengan teknologi OCR untuk mengekstrak teks.');
                 }, 500);
-            }, 2000); // Simulate longer processing time for OCR
+            }, 2000);
         }
         
         function showLoading() {
@@ -941,78 +1066,113 @@ Eko - Sakit
             document.getElementById('loading').style.display = 'none';
         }
         
+        // NEW IMPROVED PARSING FUNCTION WITH TIME ANALYSIS
         function parseAttendanceData(rawData) {
-            console.log("Memproses data:", rawData);
+            console.log("Memproses data dengan analisis waktu:", rawData);
             
             const lines = rawData.split('\n').filter(line => line.trim());
             const attendanceData = [];
+            
+            // Get time configuration from user input
+            const onTimeLimit = document.getElementById('on-time-limit').value;
+            const lateTimeLimit = document.getElementById('late-time-limit').value;
+            
+            // Convert time strings to minutes for comparison
+            const onTimeMinutes = timeToMinutes(onTimeLimit);
+            const lateTimeMinutes = timeToMinutes(lateTimeLimit);
             
             let presentCount = 0;
             let absentCount = 0;
             let lateCount = 0;
             let permissionCount = 0;
             let sickCount = 0;
+            let earlyCount = 0;
             
             lines.forEach((line, index) => {
                 let name = '';
                 let status = '';
                 let notes = '';
+                let time = '';
+                let timeMinutes = 0;
                 
                 // Clean the line
                 const cleanLine = line.trim();
                 
-                // Enhanced parsing logic with "Sakit" as separate category
-                if (cleanLine.toLowerCase().includes('hadir')) {
-                    status = 'Hadir';
-                    presentCount++;
-                } else if (cleanLine.toLowerCase().includes('absen') || cleanLine.toLowerCase().includes('tidak hadir')) {
-                    status = 'Absen';
-                    absentCount++;
-                } else if (cleanLine.toLowerCase().includes('terlambat')) {
-                    status = 'Terlambat';
-                    lateCount++;
-                } else if (cleanLine.toLowerCase().includes('izin') && !cleanLine.toLowerCase().includes('sakit')) {
-                    status = 'Izin';
-                    permissionCount++;
-                    
-                    // Extract reason if available
-                    const reasonMatch = line.match(/izin\s*\(([^)]+)\)/i);
-                    if (reasonMatch) {
-                        notes = reasonMatch[1];
-                    }
-                } else if (cleanLine.toLowerCase().includes('sakit')) {
-                    status = 'Sakit';
-                    sickCount++;
-                    
-                    // Extract reason if available
-                    const reasonMatch = line.match(/sakit\s*\(([^)]+)\)/i);
-                    if (reasonMatch) {
-                        notes = reasonMatch[1];
-                    }
-                } else {
-                    // Default to present if no status detected
-                    status = 'Hadir';
-                    presentCount++;
+                // Skip header lines or lines without time data
+                if (cleanLine.toLowerCase().includes('list') || 
+                    cleanLine.toLowerCase().includes('piket') ||
+                    cleanLine.match(/^\d+\.\s*$/)) {
+                    return;
                 }
                 
-                // Extract name (everything before the status indicator)
-                const statusIndex = cleanLine.toLowerCase().indexOf(status.toLowerCase());
-                if (statusIndex > 0) {
-                    name = cleanLine.substring(0, statusIndex).trim().replace(/[-:]/g, '').trim();
+                // Extract time using regex - supports (HH:MM), (HH.MM), HH:MM, HH.MM
+                const timeMatch = cleanLine.match(/(\d{1,2})[\.:](\d{2})/);
+                if (timeMatch) {
+                    const hours = parseInt(timeMatch[1]);
+                    const minutes = parseInt(timeMatch[2]);
+                    time = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                    timeMinutes = hours * 60 + minutes;
+                    
+                    // Determine status based on time comparison
+                    if (timeMinutes < onTimeMinutes) {
+                        status = 'Early';
+                        earlyCount++;
+                    } else if (timeMinutes <= lateTimeMinutes) {
+                        status = 'Tepat Waktu';
+                        presentCount++;
+                    } else {
+                        status = 'Terlambat';
+                        lateCount++;
+                    }
                 } else {
-                    name = cleanLine.replace(/[-:]/g, '').trim();
+                    // Fallback to text-based parsing if no time found
+                    if (cleanLine.toLowerCase().includes('hadir')) {
+                        status = 'Tepat Waktu';
+                        presentCount++;
+                    } else if (cleanLine.toLowerCase().includes('absen') || cleanLine.toLowerCase().includes('tidak hadir')) {
+                        status = 'Terlambat';
+                        lateCount++;
+                    } else if (cleanLine.toLowerCase().includes('terlambat')) {
+                        status = 'Terlambat';
+                        lateCount++;
+                    } else if (cleanLine.toLowerCase().includes('izin') && !cleanLine.toLowerCase().includes('sakit')) {
+                        status = 'Izin';
+                        permissionCount++;
+                    } else if (cleanLine.toLowerCase().includes('sakit')) {
+                        status = 'Sakit';
+                        sickCount++;
+                    } else {
+                        status = 'Tepat Waktu';
+                        presentCount++;
+                    }
                 }
+                
+                // Extract name (remove numbers, time patterns, and special characters)
+                name = cleanLine
+                    .replace(/\d+\.\s*/, '') // Remove numbering
+                    .replace(/\(.*?\)/g, '')  // Remove parentheses content
+                    .replace(/\d{1,2}[\.:]\d{2}/g, '') // Remove time patterns
+                    .replace(/[^\w\s]/g, '') // Remove special characters
+                    .trim();
                 
                 // If name is empty, use a generic name
                 if (!name) {
                     name = `Peserta ${index + 1}`;
                 }
                 
+                // Extract additional notes
+                const notesMatch = cleanLine.match(/\(([^)]+)\)/);
+                if (notesMatch && !timeMatch) {
+                    notes = notesMatch[1];
+                }
+                
                 attendanceData.push({
                     id: index + 1,
                     name: name,
                     status: status,
-                    notes: notes
+                    notes: notes,
+                    time: time,
+                    timeMinutes: timeMinutes
                 });
             });
             
@@ -1020,17 +1180,41 @@ Eko - Sakit
                 data: attendanceData,
                 summary: {
                     present: presentCount,
-                    absent: absentCount,
-                    late: lateCount,
+                    absent: lateCount, // Using absent for Terlambat
+                    late: earlyCount,  // Using late for Early
                     permission: permissionCount,
                     sick: sickCount,
-                    total: lines.length
+                    total: attendanceData.length,
+                    timeConfig: {
+                        onTime: onTimeLimit,
+                        lateTime: lateTimeLimit
+                    }
                 }
             };
         }
         
+        // Helper function to convert time string to minutes
+        function timeToMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+        
+        // Helper function to format time difference
+        function formatTimeDifference(minutes, referenceMinutes) {
+            const diff = minutes - referenceMinutes;
+            const absDiff = Math.abs(diff);
+            const hours = Math.floor(absDiff / 60);
+            const mins = absDiff % 60;
+            
+            if (diff < 0) {
+                return `${hours > 0 ? hours + 'j ' : ''}${mins}m lebih awal`;
+            } else {
+                return `${hours > 0 ? hours + 'j ' : ''}${mins}m terlambat`;
+            }
+        }
+        
         function displayResults(processedData) {
-            console.log("Menampilkan hasil:", processedData);
+            console.log("Menampilkan hasil dengan analisis waktu:", processedData);
             currentProcessedData = processedData;
             
             // Update summary cards
@@ -1041,27 +1225,62 @@ Eko - Sakit
             document.getElementById('sick-count').textContent = processedData.summary.sick;
             
             // Update quick summary
-            const quickSummary = `Total ${processedData.summary.total} peserta, ${processedData.summary.present} Hadir, ${processedData.summary.absent} Absen, ${processedData.summary.late} Terlambat, ${processedData.summary.permission} Izin, ${processedData.summary.sick} Sakit`;
+            const quickSummary = `Total ${processedData.summary.total} peserta, ${processedData.summary.present} Tepat Waktu, ${processedData.summary.absent} Terlambat, ${processedData.summary.late} Early, ${processedData.summary.permission} Izin, ${processedData.summary.sick} Sakit`;
             document.getElementById('quick-summary-text').textContent = quickSummary;
             
-            // Update table
+            // Update time configuration summary
+            const timeSummary = `Batas waktu: Tepat Waktu ≤ ${processedData.summary.timeConfig.onTime}, Terlambat > ${processedData.summary.timeConfig.lateTime}`;
+            document.getElementById('time-config-summary').textContent = timeSummary;
+            
+            // Update table with time analysis
             const tableBody = document.getElementById('attendance-table-body');
             tableBody.innerHTML = '';
+            
+            const onTimeMinutes = timeToMinutes(processedData.summary.timeConfig.onTime);
+            const lateTimeMinutes = timeToMinutes(processedData.summary.timeConfig.lateTime);
             
             processedData.data.forEach(item => {
                 const row = document.createElement('tr');
                 
                 let statusClass = '';
-                if (item.status === 'Hadir') statusClass = 'status-present';
-                else if (item.status === 'Absen') statusClass = 'status-absent';
-                else if (item.status === 'Terlambat') statusClass = 'status-late';
-                else if (item.status === 'Izin') statusClass = 'status-permission';
-                else if (item.status === 'Sakit') statusClass = 'status-sick';
+                let statusBadge = '';
+                let timeDetail = '';
+                
+                if (item.status === 'Tepat Waktu') {
+                    statusClass = 'status-present';
+                    statusBadge = '<span class="time-status status-ontime">TEPAT WAKTU</span>';
+                    if (item.time) {
+                        timeDetail = `<div class="time-detail">${formatTimeDifference(item.timeMinutes, onTimeMinutes)}</div>`;
+                    }
+                } else if (item.status === 'Terlambat') {
+                    statusClass = 'status-absent';
+                    statusBadge = '<span class="time-status status-late">TERLAMBAT</span>';
+                    if (item.time) {
+                        timeDetail = `<div class="time-detail">${formatTimeDifference(item.timeMinutes, lateTimeMinutes)}</div>`;
+                    }
+                } else if (item.status === 'Early') {
+                    statusClass = 'status-late';
+                    statusBadge = '<span class="time-status status-early">EARLY</span>';
+                    if (item.time) {
+                        timeDetail = `<div class="time-detail">${formatTimeDifference(item.timeMinutes, onTimeMinutes)}</div>`;
+                    }
+                } else if (item.status === 'Izin') {
+                    statusClass = 'status-permission';
+                    statusBadge = '<span class="time-status status-permission">IZIN</span>';
+                } else if (item.status === 'Sakit') {
+                    statusClass = 'status-sick';
+                    statusBadge = '<span class="time-status status-sick">SAKIT</span>';
+                }
                 
                 row.innerHTML = `
                     <td>${item.id}</td>
                     <td>${item.name}</td>
-                    <td class="${statusClass}">${item.status}</td>
+                    <td>${item.time || '-'}</td>
+                    <td class="${statusClass}">
+                        ${item.status}
+                        ${statusBadge}
+                        ${timeDetail}
+                    </td>
                     <td>${item.notes}</td>
                 `;
                 
@@ -1091,7 +1310,7 @@ Eko - Sakit
             attendanceChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Hadir', 'Absen', 'Terlambat', 'Izin', 'Sakit'],
+                    labels: ['Tepat Waktu', 'Terlambat', 'Early', 'Izin', 'Sakit'],
                     datasets: [{
                         label: 'Jumlah Peserta',
                         data: [
@@ -1102,9 +1321,9 @@ Eko - Sakit
                             summary.sick
                         ],
                         backgroundColor: [
-                            '#4CAF50',  // Hijau untuk Hadir
-                            '#F44336',  // Merah untuk Absen
-                            '#FF9800',  // Oranye untuk Terlambat
+                            '#4CAF50',  // Hijau untuk Tepat Waktu
+                            '#F44336',  // Merah untuk Terlambat
+                            '#FF9800',  // Oranye untuk Early
                             '#2196F3',  // Biru untuk Izin
                             '#9C27B0'   // Ungu untuk Sakit
                         ],
@@ -1136,7 +1355,10 @@ Eko - Sakit
         // Copy summary functionality
         document.getElementById('copy-summary').addEventListener('click', () => {
             const summaryText = document.getElementById('quick-summary-text').textContent;
-            navigator.clipboard.writeText(summaryText).then(() => {
+            const timeConfigText = document.getElementById('time-config-summary').textContent;
+            const fullText = `${summaryText}\n${timeConfigText}`;
+            
+            navigator.clipboard.writeText(fullText).then(() => {
                 const button = document.getElementById('copy-summary');
                 const originalText = button.querySelector('span').textContent;
                 button.querySelector('span').textContent = 'Tersalin!';
@@ -1168,29 +1390,31 @@ Eko - Sakit
             }
             
             exportToExcel(currentProcessedData);
-        });
+        }
         
         function exportToCSV(processedData) {
-            let csvContent = "No,Nama,Status,Keterangan\n";
+            let csvContent = "No,Nama,Waktu,Status,Keterangan\n";
             
             processedData.data.forEach(item => {
-                csvContent += `"${item.id}","${item.name}","${item.status}","${item.notes}"\n`;
+                csvContent += `"${item.id}","${item.name}","${item.time || '-'}","${item.status}","${item.notes}"\n`;
             });
             
             // Add summary section
             csvContent += "\n\nSUMMARY\n";
             csvContent += `Total Peserta,${processedData.summary.total}\n`;
-            csvContent += `Hadir,${processedData.summary.present}\n`;
-            csvContent += `Absen,${processedData.summary.absent}\n`;
-            csvContent += `Terlambat,${processedData.summary.late}\n`;
+            csvContent += `Tepat Waktu,${processedData.summary.present}\n`;
+            csvContent += `Terlambat,${processedData.summary.absent}\n`;
+            csvContent += `Early,${processedData.summary.late}\n`;
             csvContent += `Izin,${processedData.summary.permission}\n`;
             csvContent += `Sakit,${processedData.summary.sick}\n`;
+            csvContent += `Batas Tepat Waktu,${processedData.summary.timeConfig.onTime}\n`;
+            csvContent += `Batas Terlambat,${processedData.summary.timeConfig.lateTime}\n`;
             
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
-            link.setAttribute("download", `rekap_kehadiran_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute("download", `rekap_kehadiran_waktu_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
@@ -1203,16 +1427,18 @@ Eko - Sakit
             try {
                 // Prepare worksheet data
                 const worksheetData = [
-                    ["No", "Nama", "Status", "Keterangan"],
-                    ...processedData.data.map(item => [item.id, item.name, item.status, item.notes]),
+                    ["No", "Nama", "Waktu", "Status", "Keterangan"],
+                    ...processedData.data.map(item => [item.id, item.name, item.time || '-', item.status, item.notes]),
                     [""],
                     ["SUMMARY"],
                     ["Total Peserta", processedData.summary.total],
-                    ["Hadir", processedData.summary.present],
-                    ["Absen", processedData.summary.absent],
-                    ["Terlambat", processedData.summary.late],
+                    ["Tepat Waktu", processedData.summary.present],
+                    ["Terlambat", processedData.summary.absent],
+                    ["Early", processedData.summary.late],
                     ["Izin", processedData.summary.permission],
-                    ["Sakit", processedData.summary.sick]
+                    ["Sakit", processedData.summary.sick],
+                    ["Batas Tepat Waktu", processedData.summary.timeConfig.onTime],
+                    ["Batas Terlambat", processedData.summary.timeConfig.lateTime]
                 ];
                 
                 // Create workbook and worksheet
@@ -1223,7 +1449,7 @@ Eko - Sakit
                 XLSX.utils.book_append_sheet(wb, ws, "Rekap Kehadiran");
                 
                 // Generate Excel file and download
-                XLSX.writeFile(wb, `rekap_kehadiran_${new Date().toISOString().split('T')[0]}.xlsx`);
+                XLSX.writeFile(wb, `rekap_kehadiran_waktu_${new Date().toISOString().split('T')[0]}.xlsx`);
                 
                 showExportSuccess('Excel');
             } catch (error) {
@@ -1273,23 +1499,7 @@ Eko - Sakit
         
         // Initialize with sample data for demo
         window.addEventListener('load', () => {
-            // Pre-fill with sample data for demo
-            const sampleData = `Andi Wijaya - Hadir
-Budi Santoso - Izin (Acara Keluarga)
-Citra Lestari - Terlambat
-Dewi Anggraini - Hadir
-Eko Prasetyo - Absen
-Fajar Nugroho - Hadir
-Gita Maharani - Izin (Urusan Pribadi)
-Hana Puspita - Terlambat
-Ivan Setiawan - Hadir
-Joko Susilo - Sakit (Demam)
-Kartika Sari - Sakit
-Lia Amelia - Hadir`;
-            
-            document.getElementById('paste-input').value = sampleData;
-            
-            console.log("Website PresenceParse berhasil dimuat!");
+            console.log("Website PresenceParse dengan fitur analisis waktu berhasil dimuat!");
         });
     </script>
 </body>
