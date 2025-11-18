@@ -1174,8 +1174,7 @@ Eko - Sakit
             setTimeout(() => {
                 let sampleText;
                 if (currentFeature === 'time') {
-                    sampleText = `List piket PMR 17 April 2025
-1. Yessika (06:35)
+                    sampleText = `1. Yessika (06:35)
 2. risa alveria (06.16) 
 3. nadatul aiysah (06.27)
 4. Riska auliya (6:51)
