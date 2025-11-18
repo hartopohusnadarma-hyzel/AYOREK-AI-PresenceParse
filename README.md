@@ -1134,4 +1134,10 @@ Hana Puspita - Terlambat
 Ivan Setiawan - Hadir
 Joko Susilo - Hadir`;
             
-            document.getElementById
+            document.getElementById('paste-input').value = sampleData;
+            
+            console.log("Website PresenceParse berhasil dimuat!");
+        });
+    </script>
+</body>
+</html>
