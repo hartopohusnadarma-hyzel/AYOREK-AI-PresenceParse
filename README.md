@@ -1149,10 +1149,223 @@ Fajar - Dinas Luar
             currentProcessedData = null;
         }
 
-        // [ALL THE PREVIOUS NAVIGATION, TAB, FILE UPLOAD, AND PROCESSING CODE REMAINS THE SAME]
-        // ... (saya potong untuk hemat space, tapi semua kode sebelumnya tetap ada)
+        // Perbaikan navigasi - handle semua link navigasi
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                
+                if (targetSection) {
+                    // Tutup mobile menu jika terbuka
+                    mainNav.classList.remove('active');
+                    
+                    // Scroll ke section target
+                    targetSection.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
 
-        // MODIFIED PARSING FUNCTION TO SUPPORT CUSTOM CATEGORIES
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+            });
+        });
+        
+        // File upload functionality
+        const fileUploadArea = document.getElementById('file-upload-area');
+        const fileInput = document.getElementById('file-input');
+        const processFileBtn = document.getElementById('process-file');
+        
+        fileUploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--primary)';
+            fileUploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+        });
+        
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.style.borderColor = '#ddd';
+            fileUploadArea.style.backgroundColor = 'transparent';
+        });
+        
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = '#ddd';
+            fileUploadArea.style.backgroundColor = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                processFileBtn.disabled = false;
+                fileUploadArea.querySelector('p').textContent = `File dipilih: ${e.dataTransfer.files[0].name}`;
+            }
+        });
+        
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) {
+                processFileBtn.disabled = false;
+                fileUploadArea.querySelector('p').textContent = `File dipilih: ${fileInput.files[0].name}`;
+            }
+        });
+        
+        // OCR upload functionality
+        const ocrUploadArea = document.getElementById('ocr-upload-area');
+        const ocrInput = document.getElementById('ocr-input');
+        const processOcrBtn = document.getElementById('process-ocr');
+        
+        ocrUploadArea.addEventListener('click', () => {
+            ocrInput.click();
+        });
+        
+        ocrUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            ocrUploadArea.style.borderColor = 'var(--primary)';
+            ocrUploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+        });
+        
+        ocrUploadArea.addEventListener('dragleave', () => {
+            ocrUploadArea.style.borderColor = '#ddd';
+            ocrUploadArea.style.backgroundColor = 'transparent';
+        });
+        
+        ocrUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            ocrUploadArea.style.borderColor = '#ddd';
+            ocrUploadArea.style.backgroundColor = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                ocrInput.files = e.dataTransfer.files;
+                processOcrBtn.disabled = false;
+                ocrUploadArea.querySelector('p').textContent = `Gambar dipilih: ${e.dataTransfer.files[0].name}`;
+            }
+        });
+        
+        ocrInput.addEventListener('change', () => {
+            if (ocrInput.files.length) {
+                processOcrBtn.disabled = false;
+                ocrUploadArea.querySelector('p').textContent = `Gambar dipilih: ${ocrInput.files[0].name}`;
+            }
+        });
+        
+        // Process data functions - FIXED VERSION
+        document.getElementById('process-paste').addEventListener('click', processPasteData);
+        document.getElementById('process-file').addEventListener('click', processFileData);
+        document.getElementById('process-ocr').addEventListener('click', processOcrData);
+        
+        function processPasteData() {
+            const inputText = document.getElementById('paste-input').value;
+            if (!inputText.trim()) {
+                alert('Silakan tempel data kehadiran terlebih dahulu.');
+                return;
+            }
+            
+            showLoading();
+            setTimeout(() => {
+                const processedData = parseAttendanceData(inputText);
+                hideLoading();
+                displayResults(processedData);
+            }, 1000);
+        }
+        
+        function processFileData() {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Silakan pilih file terlebih dahulu.');
+                return;
+            }
+            
+            showLoading();
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                setTimeout(() => {
+                    const processedData = parseAttendanceData(e.target.result);
+                    hideLoading();
+                    displayResults(processedData);
+                }, 1000);
+            };
+            reader.readAsText(file);
+        }
+        
+        function processOcrData() {
+            const file = ocrInput.files[0];
+            if (!file) {
+                alert('Silakan pilih gambar terlebih dahulu.');
+                return;
+            }
+            
+            showLoading();
+            // Simulate OCR processing
+            setTimeout(() => {
+                let sampleText;
+                if (currentFeature === 'time') {
+                    sampleText = `List piket PMR 17 April 2025
+1. Yessika (06:35)
+2. risa alveria (06.16) 
+3. nadatul aiysah (06.27)
+4. Riska auliya (6:51)
+5. Tara aldiana nahara sakila (6:51)
+6. Rachmania (6.34) mengganti hari senin 
+7. Salsa nur(6.13)
+8. Delfi Anandarista (06.20)
+9. Hartopo husna d ( 06.33 )
+10. Nurul (06.55)`;
+                } else {
+                    sampleText = `Andi - Hadir
+Budi - Izin (Sakit)
+Citra - Terlambat
+Dewi - Hadir
+Eko - Sakit
+Fajar - Dinas Luar
+Gita - Izin (Keluarga)
+Hana - Terlambat
+Ivan - Hadir
+Joko - Cuti Tahunan`;
+                }
+                
+                const processedData = parseAttendanceData(sampleText);
+                hideLoading();
+                displayResults(processedData);
+                
+                setTimeout(() => {
+                    alert('Catatan: Ini adalah simulasi OCR. Dalam implementasi nyata, gambar akan diproses dengan teknologi OCR untuk mengekstrak teks.');
+                }, 500);
+            }, 2000);
+        }
+        
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        // FIXED PARSING FUNCTION
+        function parseAttendanceData(rawData) {
+            if (currentFeature === 'time') {
+                return parseTimeBasedData(rawData);
+            } else {
+                return parseStatusBasedData(rawData);
+            }
+        }
+        
+        // ORIGINAL STATUS-BASED PARSING (HADIR, IZIN, SAKIT, ABSEN) - FIXED
         function parseStatusBasedData(rawData) {
             console.log("Memproses data status kehadiran dengan kategori kustom:", rawData);
             
@@ -1269,19 +1482,150 @@ Fajar - Dinas Luar
             };
         }
         
+        // TIME-BASED PARSING (EARLY, TEPAT WAKTU, TERLAMBAT) - FIXED
+        function parseTimeBasedData(rawData) {
+            console.log("Memproses data analisis waktu:", rawData);
+            
+            const lines = rawData.split('\n').filter(line => line.trim());
+            const attendanceData = [];
+            
+            // Get time configuration from user input
+            const onTimeLimit = document.getElementById('on-time-limit').value;
+            const lateTimeLimit = document.getElementById('late-time-limit').value;
+            
+            // Convert time strings to minutes for comparison
+            const onTimeMinutes = timeToMinutes(onTimeLimit);
+            const lateTimeMinutes = timeToMinutes(lateTimeLimit);
+            
+            let earlyCount = 0;
+            let ontimeCount = 0;
+            let lateCount = 0;
+            let permissionCount = 0;
+            let sickCount = 0;
+            
+            lines.forEach((line, index) => {
+                let name = '';
+                let status = '';
+                let notes = '';
+                let time = '';
+                let timeMinutes = 0;
+                
+                // Clean the line
+                const cleanLine = line.trim();
+                
+                // Skip header lines or empty lines
+                if (cleanLine.toLowerCase().includes('list') || 
+                    cleanLine.toLowerCase().includes('piket') ||
+                    cleanLine.match(/^\d+\.\s*$/) ||
+                    !cleanLine) {
+                    return;
+                }
+                
+                // Extract time using regex - supports (HH:MM), (HH.MM), HH:MM, HH.MM
+                const timeMatch = cleanLine.match(/(\d{1,2})[\.:](\d{2})/);
+                if (timeMatch) {
+                    const hours = parseInt(timeMatch[1]);
+                    const minutes = parseInt(timeMatch[2]);
+                    time = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                    timeMinutes = hours * 60 + minutes;
+                    
+                    // Determine status based on time comparison
+                    if (timeMinutes < onTimeMinutes) {
+                        status = 'Early';
+                        earlyCount++;
+                    } else if (timeMinutes <= lateTimeMinutes) {
+                        status = 'Tepat Waktu';
+                        ontimeCount++;
+                    } else {
+                        status = 'Terlambat';
+                        lateCount++;
+                    }
+                } else {
+                    // If no time data, check for text status
+                    if (cleanLine.toLowerCase().includes('izin')) {
+                        status = 'Izin';
+                        permissionCount++;
+                    } else if (cleanLine.toLowerCase().includes('sakit')) {
+                        status = 'Sakit';
+                        sickCount++;
+                    } else {
+                        status = 'Tepat Waktu';
+                        ontimeCount++;
+                    }
+                }
+                
+                // Extract name
+                name = cleanLine
+                    .replace(/\d+\.\s*/, '') // Remove numbering
+                    .replace(/\(.*?\)/g, '')  // Remove parentheses content
+                    .replace(/\d{1,2}[\.:]\d{2}/g, '') // Remove time patterns
+                    .replace(/[^\w\s]/g, '') // Remove special characters
+                    .trim();
+                
+                // If name is empty, use a generic name
+                if (!name) {
+                    name = `Peserta ${index + 1}`;
+                }
+                
+                // Extract additional notes
+                const notesMatch = cleanLine.match(/\(([^)]+)\)/);
+                if (notesMatch && !timeMatch) {
+                    notes = notesMatch[1];
+                }
+                
+                attendanceData.push({
+                    id: index + 1,
+                    name: name,
+                    status: status,
+                    notes: notes,
+                    time: time,
+                    timeMinutes: timeMinutes,
+                    categoryColor: getCategoryColor(status)
+                });
+            });
+            
+            return {
+                data: attendanceData,
+                summary: {
+                    early: earlyCount,
+                    ontime: ontimeCount,
+                    late: lateCount,
+                    permission: permissionCount,
+                    sick: sickCount,
+                    total: attendanceData.length,
+                    timeConfig: {
+                        onTime: onTimeLimit,
+                        lateTime: lateTimeLimit
+                    }
+                }
+            };
+        }
+        
         function getCategoryColor(status) {
             const category = customCategories.find(cat => cat.name === status);
             return category ? category.color : '#6c757d'; // Default gray color
         }
+        
+        // Helper function to convert time string to minutes
+        function timeToMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
 
-        // MODIFIED DISPLAY FUNCTION TO SUPPORT DYNAMIC CATEGORIES
+        // FIXED DISPLAY FUNCTION
         function displayResults(processedData) {
-            console.log("Menampilkan hasil dengan kategori dinamis:", processedData);
+            console.log("Menampilkan hasil:", processedData);
             currentProcessedData = processedData;
             
             if (currentFeature === 'time') {
-                // [Time analysis display code remains the same]
-                // ... (potong untuk hemat space)
+                // Update time analysis
+                document.getElementById('quick-summary-text').textContent = 
+                    `Total ${processedData.summary.total} peserta, ${processedData.summary.early} Early, ${processedData.summary.ontime} Tepat Waktu, ${processedData.summary.late} Terlambat, ${processedData.summary.permission} Izin, ${processedData.summary.sick} Sakit`;
+                
+                document.getElementById('time-config-summary').textContent = 
+                    `Batas waktu: Tepat Waktu ≤ ${processedData.summary.timeConfig.onTime}, Terlambat > ${processedData.summary.timeConfig.lateTime}`;
+                
+                createTimeChart(processedData.summary);
             } else {
                 // Update summary cards dynamically based on categories
                 updateSummaryCards(processedData.summary.categories);
@@ -1302,7 +1646,6 @@ Fajar - Dinas Luar
             processedData.data.forEach(item => {
                 const row = document.createElement('tr');
                 
-                const statusClass = `status-${item.status.toLowerCase().replace(' ', '-')}`;
                 const statusStyle = `color: ${item.categoryColor}; font-weight: 600;`;
                 
                 let timeColumn = item.status;
@@ -1373,7 +1716,6 @@ Fajar - Dinas Luar
             const labels = [];
             const data = [];
             const backgroundColors = [];
-            const borderColors = [];
             
             // Only include categories that have counts > 0
             Object.entries(categoryCounts).forEach(([categoryName, count]) => {
@@ -1382,7 +1724,6 @@ Fajar - Dinas Luar
                     labels.push(categoryName);
                     data.push(count);
                     backgroundColors.push(category ? category.color : '#6c757d');
-                    borderColors.push(category ? darkenColor(category.color, 20) : '#495057');
                 }
             });
             
@@ -1394,7 +1735,6 @@ Fajar - Dinas Luar
                         label: 'Jumlah Peserta',
                         data: data,
                         backgroundColor: backgroundColors,
-                        borderColor: borderColors,
                         borderWidth: 1
                     }]
                 },
@@ -1413,26 +1753,233 @@ Fajar - Dinas Luar
             });
         }
         
-        function darkenColor(color, percent) {
-            // Simple function to darken a color
-            const num = parseInt(color.replace("#", ""), 16);
-            const amt = Math.round(2.55 * percent);
-            const R = (num >> 16) - amt;
-            const G = (num >> 8 & 0x00FF) - amt;
-            const B = (num & 0x0000FF) - amt;
-            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        function createTimeChart(summary) {
+            const ctx = document.getElementById('attendance-chart').getContext('2d');
+            
+            // If a chart already exists, destroy it
+            if (attendanceChart) {
+                attendanceChart.destroy();
+            }
+            
+            attendanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Early', 'Tepat Waktu', 'Terlambat', 'Izin', 'Sakit'],
+                    datasets: [{
+                        label: 'Jumlah Peserta',
+                        data: [
+                            summary.early, 
+                            summary.ontime, 
+                            summary.late, 
+                            summary.permission, 
+                            summary.sick
+                        ],
+                        backgroundColor: [
+                            '#4CAF50',  // Hijau untuk Early
+                            '#2196F3',  // Biru untuk Tepat Waktu
+                            '#FF9800',  // Oranye untuk Terlambat
+                            '#2196F3',  // Biru untuk Izin
+                            '#9C27B0'   // Ungu untuk Sakit
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
         }
 
-        // Initialize categories list on load
-        document.addEventListener('DOMContentLoaded', () => {
+        // Copy summary functionality
+        document.getElementById('copy-summary').addEventListener('click', () => {
+            const summaryText = document.getElementById('quick-summary-text').textContent;
+            const timeConfigText = document.getElementById('time-config-summary').textContent;
+            const fullText = timeConfigText ? `${summaryText}\n${timeConfigText}` : summaryText;
+            
+            navigator.clipboard.writeText(fullText).then(() => {
+                const button = document.getElementById('copy-summary');
+                const originalText = button.querySelector('span').textContent;
+                button.querySelector('span').textContent = 'Tersalin!';
+                
+                setTimeout(() => {
+                    button.querySelector('span').textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Gagal menyalin teks: ', err);
+                alert('Gagal menyalin teks. Silakan salin manual.');
+            });
+        });
+        
+        // Export to CSV functionality
+        document.getElementById('export-csv').addEventListener('click', () => {
+            if (!currentProcessedData) {
+                alert('Tidak ada data untuk diekspor. Silakan proses data terlebih dahulu.');
+                return;
+            }
+            
+            exportToCSV(currentProcessedData);
+        });
+        
+        // Export to Excel functionality
+        document.getElementById('export-excel').addEventListener('click', () => {
+            if (!currentProcessedData) {
+                alert('Tidak ada data untuk diekspor. Silakan proses data terlebih dahulu.');
+                return;
+            }
+            
+            exportToExcel(currentProcessedData);
+        });
+        
+        function exportToCSV(processedData) {
+            let csvContent = "No,Nama," + (currentFeature === 'time' ? "Waktu" : "Status") + ",Keterangan\n";
+            
+            processedData.data.forEach(item => {
+                const statusOrTime = currentFeature === 'time' ? (item.time || item.status) : item.status;
+                csvContent += `"${item.id}","${item.name}","${statusOrTime}","${item.notes}"\n`;
+            });
+            
+            // Add summary section
+            csvContent += "\n\nSUMMARY\n";
+            if (currentFeature === 'time') {
+                csvContent += `Total Peserta,${processedData.summary.total}\n`;
+                csvContent += `Early,${processedData.summary.early}\n`;
+                csvContent += `Tepat Waktu,${processedData.summary.ontime}\n`;
+                csvContent += `Terlambat,${processedData.summary.late}\n`;
+                csvContent += `Izin,${processedData.summary.permission}\n`;
+                csvContent += `Sakit,${processedData.summary.sick}\n`;
+                csvContent += `Batas Tepat Waktu,${processedData.summary.timeConfig.onTime}\n`;
+                csvContent += `Batas Terlambat,${processedData.summary.timeConfig.lateTime}\n`;
+            } else {
+                csvContent += `Total Peserta,${processedData.summary.total}\n`;
+                // Add all categories that have counts > 0
+                Object.entries(processedData.summary.categories).forEach(([category, count]) => {
+                    if (count > 0) {
+                        csvContent += `${category},${count}\n`;
+                    }
+                });
+            }
+            
+            const fileName = currentFeature === 'time' ? 'analisis_waktu' : 'rekap_kehadiran';
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `${fileName}_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showExportSuccess('CSV');
+        }
+        
+        function exportToExcel(processedData) {
+            try {
+                // Prepare worksheet data
+                const worksheetData = [
+                    ["No", "Nama", (currentFeature === 'time' ? "Waktu" : "Status"), "Keterangan"],
+                    ...processedData.data.map(item => {
+                        const statusOrTime = currentFeature === 'time' ? (item.time || item.status) : item.status;
+                        return [item.id, item.name, statusOrTime, item.notes];
+                    }),
+                    [""],
+                    ["SUMMARY"]
+                ];
+                
+                // Add summary data based on feature
+                if (currentFeature === 'time') {
+                    worksheetData.push(
+                        ["Total Peserta", processedData.summary.total],
+                        ["Early", processedData.summary.early],
+                        ["Tepat Waktu", processedData.summary.ontime],
+                        ["Terlambat", processedData.summary.late],
+                        ["Izin", processedData.summary.permission],
+                        ["Sakit", processedData.summary.sick],
+                        ["Batas Tepat Waktu", processedData.summary.timeConfig.onTime],
+                        ["Batas Terlambat", processedData.summary.timeConfig.lateTime]
+                    );
+                } else {
+                    worksheetData.push(["Total Peserta", processedData.summary.total]);
+                    // Add all categories that have counts > 0
+                    Object.entries(processedData.summary.categories).forEach(([category, count]) => {
+                        if (count > 0) {
+                            worksheetData.push([category, count]);
+                        }
+                    });
+                }
+                
+                // Create workbook and worksheet
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+                
+                // Add worksheet to workbook
+                const sheetName = currentFeature === 'time' ? "Analisis Waktu" : "Rekap Kehadiran";
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                
+                // Generate Excel file and download
+                const fileName = currentFeature === 'time' ? 'analisis_waktu' : 'rekap_kehadiran';
+                XLSX.writeFile(wb, `${fileName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+                
+                showExportSuccess('Excel');
+            } catch (error) {
+                console.error('Error exporting to Excel:', error);
+                alert('Terjadi error saat mengekspor ke Excel. Silakan coba lagi.');
+            }
+        }
+        
+        function showExportSuccess(format) {
+            const button = document.getElementById(`export-${format.toLowerCase()}`);
+            const originalText = button.querySelector('span').textContent;
+            button.querySelector('span').textContent = `✅ ${format} Terunduh!`;
+            button.style.backgroundColor = '#4CAF50';
+            
+            setTimeout(() => {
+                button.querySelector('span').textContent = originalText;
+                button.style.backgroundColor = '';
+            }, 2000);
+        }
+        
+        // Reset data functionality
+        document.getElementById('reset-data').addEventListener('click', () => {
+            document.getElementById('results-section').classList.remove('active');
+            document.getElementById('paste-input').value = '';
+            document.getElementById('file-input').value = '';
+            document.getElementById('ocr-input').value = '';
+            fileUploadArea.querySelector('p').textContent = 'Klik untuk memilih file atau seret file ke sini';
+            ocrUploadArea.querySelector('p').textContent = 'Klik untuk memilih gambar atau seret gambar ke sini';
+            processFileBtn.disabled = true;
+            processOcrBtn.disabled = true;
+            currentProcessedData = null;
+            
+            // Scroll back to process section
+            document.getElementById('process').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Scroll to section function
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+        
+        // Initialize with sample data for demo
+        window.addEventListener('load', () => {
+            console.log("Website PresenceParse dengan fitur kategori kustom berhasil dimuat!");
             updateCategoriesList();
         });
-
-        // [ALL OTHER FUNCTIONS REMAIN THE SAME - Copy, Export, Reset, etc.]
-        // ... (saya potong untuk hemat space)
-
     </script>
 </body>
 </html>
