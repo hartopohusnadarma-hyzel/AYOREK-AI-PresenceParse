@@ -648,6 +648,120 @@
             margin-left: 8px;
             color: white;
         }
+
+        /* NEW STYLES FOR GROUPING FEATURE */
+        .grouping-controls {
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid #4361ee;
+        }
+
+        .grouping-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .group-btn {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .group-btn:hover {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+
+        .group-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .grouped-view {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .grouped-view.active {
+            display: block;
+        }
+
+        .group-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--box-shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .group-title {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .group-count {
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .group-members {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .member-tag {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .member-time {
+            font-size: 0.8rem;
+            color: var(--gray);
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .empty-group {
+            color: var(--gray);
+            font-style: italic;
+            padding: 1rem;
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
         
         /* Media queries untuk tablet */
         @media (min-width: 768px) {
@@ -709,6 +823,10 @@
                 width: auto;
                 margin: 0;
             }
+
+            .grouping-options {
+                gap: 1rem;
+            }
         }
         
         /* Media queries untuk desktop */
@@ -719,30 +837,6 @@
             
             .hero h2 {
                 font-size: 2.5rem;
-            }
-        }
-        
-        /* Perbaikan khusus untuk iOS */
-        @supports (-webkit-touch-callout: none) {
-            .input-area {
-                font-size: 16px;
-            }
-            
-            .btn {
-                -webkit-appearance: none;
-            }
-        }
-        
-        /* Perbaikan untuk browser lama */
-        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-            .features {
-                display: flex;
-                flex-wrap: wrap;
-            }
-            
-            .feature-card {
-                flex: 1 1 300px;
-                margin: 10px;
             }
         }
     </style>
@@ -770,8 +864,8 @@
 
     <section class="hero" id="home">
         <div class="container">
-            <h2>PresenceParse dengan Kategori Kustom</h2>
-            <p>Sekarang dengan fitur kategori kustom! Tambahkan kategori sendiri sesuai kebutuhan Anda.</p>
+            <h2>PresenceParse dengan Fitur Pengelompokan</h2>
+            <p>Analisis data kehadiran dengan pengelompokan cerdas berdasarkan status, keterangan, dan waktu</p>
             <button class="btn" onclick="scrollToSection('process')">
                 <span>Coba Sekarang</span>
             </button>
@@ -793,9 +887,9 @@
                     <p>Deteksi otomatis status Early, Tepat Waktu, atau Terlambat berdasarkan waktu kedatangan.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🎨</div>
-                    <h3>Kategori Kustom</h3>
-                    <p>Tambahkan kategori sendiri dengan warna kustom untuk kebutuhan spesifik Anda.</p>
+                    <div class="feature-icon">👥</div>
+                    <h3>Pengelompokan Cerdas</h3>
+                    <p>Kelompokkan data berdasarkan status, keterangan, atau waktu untuk analisis yang lebih mendalam.</p>
                 </div>
             </div>
         </div>
@@ -948,22 +1042,50 @@ Joko - Cuti Tahunan</textarea>
                             <span>Salin Ringkasan</span>
                         </button>
                     </div>
-                    
-                    <h3 style="margin-top: 2rem;">Detail Kehadiran</h3>
-                    <div style="overflow-x: auto;">
-                        <table id="attendance-table">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama</th>
-                                    <th id="time-column-header">Status</th>
-                                    <th>Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="attendance-table-body">
-                                <!-- Data akan diisi oleh JavaScript -->
-                            </tbody>
-                        </table>
+
+                    <!-- NEW GROUPING CONTROLS -->
+                    <div class="grouping-controls">
+                        <h3>👥 Pengelompokan Data</h3>
+                        <p>Kelompokkan data berdasarkan kriteria tertentu untuk analisis yang lebih mendalam</p>
+                        <div class="grouping-options">
+                            <button class="group-btn active" data-group-by="none">
+                                📋 Tampilan Normal
+                            </button>
+                            <button class="group-btn" data-group-by="status">
+                                🏷️ Kelompokkan by Status
+                            </button>
+                            <button class="group-btn" data-group-by="notes">
+                                📝 Kelompokkan by Keterangan
+                            </button>
+                            <button class="group-btn" data-group-by="time">
+                                ⏰ Kelompokkan by Waktu
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- GROUPED VIEW -->
+                    <div class="grouped-view" id="grouped-view">
+                        <!-- Grouped content will be generated here -->
+                    </div>
+
+                    <!-- NORMAL TABLE VIEW -->
+                    <div id="normal-view">
+                        <h3 style="margin-top: 2rem;">Detail Kehadiran</h3>
+                        <div style="overflow-x: auto;">
+                            <table id="attendance-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th id="time-column-header">Status</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-table-body">
+                                    <!-- Data akan diisi oleh JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     
                     <div class="export-options">
@@ -1149,7 +1271,7 @@ Fajar - Dinas Luar
             currentProcessedData = null;
         }
 
-        // Perbaikan navigasi - handle semua link navigasi
+        // Navigation functionality
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -1263,7 +1385,7 @@ Fajar - Dinas Luar
             }
         });
         
-        // Process data functions - FIXED VERSION
+        // Process data functions
         document.getElementById('process-paste').addEventListener('click', processPasteData);
         document.getElementById('process-file').addEventListener('click', processFileData);
         document.getElementById('process-ocr').addEventListener('click', processOcrData);
@@ -1356,7 +1478,6 @@ Joko - Cuti Tahunan`;
             document.getElementById('loading').style.display = 'none';
         }
         
-        // FIXED PARSING FUNCTION
         function parseAttendanceData(rawData) {
             if (currentFeature === 'time') {
                 return parseTimeBasedData(rawData);
@@ -1365,7 +1486,6 @@ Joko - Cuti Tahunan`;
             }
         }
         
-        // ORIGINAL STATUS-BASED PARSING (HADIR, IZIN, SAKIT, ABSEN) - FIXED
         function parseStatusBasedData(rawData) {
             console.log("Memproses data status kehadiran dengan kategori kustom:", rawData);
             
@@ -1482,7 +1602,6 @@ Joko - Cuti Tahunan`;
             };
         }
         
-        // TIME-BASED PARSING (EARLY, TEPAT WAKTU, TERLAMBAT) - FIXED
         function parseTimeBasedData(rawData) {
             console.log("Memproses data analisis waktu:", rawData);
             
@@ -1606,13 +1725,118 @@ Joko - Cuti Tahunan`;
             return category ? category.color : '#6c757d'; // Default gray color
         }
         
-        // Helper function to convert time string to minutes
         function timeToMinutes(timeStr) {
             const [hours, minutes] = timeStr.split(':').map(Number);
             return hours * 60 + minutes;
         }
 
-        // FIXED DISPLAY FUNCTION
+        // NEW GROUPING FUNCTIONALITY
+        function initializeGrouping() {
+            const groupButtons = document.querySelectorAll('.group-btn');
+            
+            groupButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    groupButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    const groupBy = this.getAttribute('data-group-by');
+                    applyGrouping(groupBy);
+                });
+            });
+        }
+        
+        function applyGrouping(groupBy) {
+            const groupedView = document.getElementById('grouped-view');
+            const normalView = document.getElementById('normal-view');
+            
+            if (groupBy === 'none') {
+                groupedView.classList.remove('active');
+                normalView.style.display = 'block';
+                return;
+            }
+            
+            groupedView.classList.add('active');
+            normalView.style.display = 'none';
+            
+            if (!currentProcessedData) return;
+            
+            const groupedData = groupData(currentProcessedData.data, groupBy);
+            renderGroupedView(groupedData, groupBy);
+        }
+        
+        function groupData(data, groupBy) {
+            const groups = {};
+            
+            data.forEach(item => {
+                let groupKey;
+                
+                switch (groupBy) {
+                    case 'status':
+                        groupKey = item.status || 'Tidak Ada Status';
+                        break;
+                    case 'notes':
+                        groupKey = item.notes || 'Tidak Ada Keterangan';
+                        break;
+                    case 'time':
+                        if (currentFeature === 'time') {
+                            groupKey = item.time || 'Tidak Ada Waktu';
+                        } else {
+                            groupKey = item.status || 'Tidak Ada Status';
+                        }
+                        break;
+                    default:
+                        groupKey = 'Ungrouped';
+                }
+                
+                if (!groups[groupKey]) {
+                    groups[groupKey] = [];
+                }
+                
+                groups[groupKey].push(item);
+            });
+            
+            return groups;
+        }
+        
+        function renderGroupedView(groupedData, groupBy) {
+            const groupedView = document.getElementById('grouped-view');
+            let html = '';
+            
+            // Sort groups by count (descending)
+            const sortedGroups = Object.entries(groupedData)
+                .sort(([,a], [,b]) => b.length - a.length);
+            
+            if (sortedGroups.length === 0) {
+                html = '<div class="empty-group">Tidak ada data untuk dikelompokkan</div>';
+            } else {
+                sortedGroups.forEach(([groupName, items]) => {
+                    const category = customCategories.find(cat => cat.name === groupName);
+                    const borderColor = category ? category.color : '#4361ee';
+                    
+                    html += `
+                        <div class="group-section" style="border-left-color: ${borderColor}">
+                            <div class="group-header">
+                                <div class="group-title">${groupName}</div>
+                                <div class="group-count">${items.length} orang</div>
+                            </div>
+                            <div class="group-members">
+                                ${items.map(item => `
+                                    <div class="member-tag">
+                                        ${item.name}
+                                        ${item.time ? `<span class="member-time">${item.time}</span>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            groupedView.innerHTML = html;
+        }
+
         function displayResults(processedData) {
             console.log("Menampilkan hasil:", processedData);
             currentProcessedData = processedData;
@@ -1662,6 +1886,10 @@ Joko - Cuti Tahunan`;
                 
                 tableBody.appendChild(row);
             });
+            
+            // Initialize grouping functionality
+            initializeGrouping();
+            applyGrouping('none'); // Reset to normal view
             
             // Show results section
             document.getElementById('results-section').classList.add('active');
@@ -1960,6 +2188,10 @@ Joko - Cuti Tahunan`;
             processOcrBtn.disabled = true;
             currentProcessedData = null;
             
+            // Reset grouping view
+            document.querySelector('[data-group-by="none"]').click();
+            document.getElementById('grouped-view').innerHTML = '';
+            
             // Scroll back to process section
             document.getElementById('process').scrollIntoView({ behavior: 'smooth' });
         });
@@ -1977,8 +2209,9 @@ Joko - Cuti Tahunan`;
         
         // Initialize with sample data for demo
         window.addEventListener('load', () => {
-            console.log("Website PresenceParse dengan fitur kategori kustom berhasil dimuat!");
+            console.log("Website PresenceParse dengan fitur pengelompokan berhasil dimuat!");
             updateCategoriesList();
+            initializeGrouping();
         });
     </script>
 </body>
