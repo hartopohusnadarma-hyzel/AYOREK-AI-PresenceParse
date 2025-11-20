@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PresenceParse - Rekap Absensi Universal</title>
+    <title>PresenceParse Pro - Solusi Analisis Kehadiran Lengkap</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -847,7 +847,7 @@
             <div class="header-content">
                 <div class="logo">
                     <div class="logo-icon">📊</div>
-                    <h1>PresenceParse</h1>
+                    <h1>PresenceParse Pro</h1>
                 </div>
                 <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
                 <nav id="main-nav">
@@ -864,8 +864,8 @@
 
     <section class="hero" id="home">
         <div class="container">
-            <h2>PresenceParse dengan Fitur Pengelompokan</h2>
-            <p>Analisis data kehadiran dengan pengelompokan cerdas berdasarkan status, keterangan, dan waktu</p>
+            <h2>PresenceParse Pro - Solusi Analisis Kehadiran Lengkap</h2>
+            <p>Platform profesional untuk analisis kehadiran dengan fitur kategori kustom, analisis waktu, dan laporan komprehensif.</p>
             <button class="btn" onclick="scrollToSection('process')">
                 <span>Coba Sekarang</span>
             </button>
@@ -1109,9 +1109,9 @@ Joko - Cuti Tahunan</textarea>
             <div class="footer-content">
                 <div class="logo">
                     <div class="logo-icon">📊</div>
-                    <h1>PresenceParse</h1>
+                    <h1>PresenceParse Pro</h1>
                 </div>
-                <p>&copy; 2023 PresenceParse. All rights reserved.</p>
+                <p>&copy; 2023 PresenceParse Pro. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -2209,7 +2209,7 @@ Joko - Cuti Tahunan`;
         
         // Initialize with sample data for demo
         window.addEventListener('load', () => {
-            console.log("Website PresenceParse dengan fitur pengelompokan berhasil dimuat!");
+            console.log("Website PresenceParse Pro dengan fitur pengelompokan berhasil dimuat!");
             updateCategoriesList();
             initializeGrouping();
         });
